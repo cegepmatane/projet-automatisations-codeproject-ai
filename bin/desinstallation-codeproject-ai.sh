@@ -5,7 +5,6 @@
 # Usage : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/desinstallation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
 # =============================================================================
 
-set -e
 
 if [ "$EUID" -ne 0 ]; then
   echo "Ce script doit etre execute avec sudo."
