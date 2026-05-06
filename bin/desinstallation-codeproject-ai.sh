@@ -1,20 +1,20 @@
 #!/bin/bash
 # =============================================================================
-# Script d'installation de Codeproject.AI
+# Script d'desinstallation de Codeproject.AI
 # Configure : [A DETERMINER]
-# Usage : sudo bash installation-codeproject-ai.sh
+# Usage : sudo bash desinstallation-codeproject-ai.sh
 # =============================================================================
 
 set -e
 
 if [ "$EUID" -ne 0 ]; then
   echo "Ce script doit etre execute avec sudo."
-  echo "Exemple : sudo bash installation-codeproject-ai.sh"
+  echo "Exemple : sudo bash desinstallation-codeproject-ai.sh"
   exit 1
 fi
 
 echo "============================================================"
-echo "  Installation de Codeproject.AI"
+echo "  Desinstallation de Codeproject.AI"
 echo "============================================================"
 echo ""
 
