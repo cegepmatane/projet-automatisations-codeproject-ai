@@ -140,3 +140,10 @@ cd "$DIR"
 unset REPO
 unset DIR
 ```
+
+#### 8. Username
+
+```bash
+git config --global user.name "enderbird"
+git config --global user.email "cedricsimard28@gmail.com"
+```
