@@ -68,7 +68,6 @@ echo ">>> Etape 3/X : Installation de CodeProject.AI-Server"
 wget https://codeproject-ai-bunny.b-cdn.net/server/installers/linux/codeproject.ai-server_2.9.5_Ubuntu_x64.zip
 
 unzip -o codeproject.ai-server_2.9.5_Ubuntu_x64.zip
-
 dpkg -i codeproject.ai-server_2.9.5_Ubuntu_x64.deb || apt --fix-broken install -y
 
 pushd "/usr/bin/codeproject.ai-server-2.9.5/" && bash setup.sh && popd
@@ -76,6 +75,8 @@ pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
 
 rm -f codeproject.ai-server_2.9.5_Ubuntu_x64.zip
 rm -f codeproject.ai-server_2.9.5_Ubuntu_x64.deb
+
+echo "CodeProject.AI-Server installe (OK)"
 
 echo ""
 
