@@ -40,7 +40,8 @@ echo ""
 echo ">>> Etape 2/X : Installation .NET 9"
 
 apt-get update
-add-apt-repository ppa:dotnet/backports
+add-apt-repository -y ppa:dotnet/backports
+apt-get update
 apt-get install -y dotnet-sdk-9.0
 
 dotnet --version
