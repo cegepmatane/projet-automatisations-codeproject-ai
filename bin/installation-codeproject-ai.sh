@@ -2,7 +2,7 @@
 # =============================================================================
 # Script d'installation de Codeproject.AI
 # Configure : [A DETERMINER]
-# Usage : tmp=$(mktemp) && curl -fsSL https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
+# Usage : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
 # =============================================================================
 
 set -e
