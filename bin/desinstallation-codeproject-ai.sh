@@ -41,12 +41,22 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">>> Etape 2/X : Desinstallation .NET 9"
 
-apt-get purge -y dotnet* || true
+# Pour pas avoir de conflits
+systemctl stop codeproject.ai-server 2>/dev/null || true
+systemctl disable codeproject.ai-server 2>/dev/null || true
+
+apt-get purge -y dotnet-sdk-9.0 || true
+apt-get purge -y dotnet-host-9.0 || true
 apt-get autoremove -y
 yes | add-apt-repository --remove ppa:dotnet/backports || true
 apt-get update
 
-dotnet --version 2>/dev/null && echo "dotnet ENCORE PRESENT" || echo "dotnet supprimé (OK)"
+if dotnet --version 2>/dev/null; then
+  echo "dotnet ENCORE PRESENT (PAS OK)"
+  exit 1
+else
+  echo "dotnet supprimé (OK)"
+fi
 
 echo ""
 
@@ -72,9 +82,6 @@ echo ""
 # 4. Desinstallation de CodeProject.AI-Server
 # -----------------------------------------------------------------------------
 echo ">>> Etape 4/X : Desinstallation de CodeProject.AI-Server"
-
-systemctl stop codeproject.ai-server 2>/dev/null || true
-systemctl disable codeproject.ai-server 2>/dev/null || true
 
 dpkg -r codeproject.ai-server || true
 
