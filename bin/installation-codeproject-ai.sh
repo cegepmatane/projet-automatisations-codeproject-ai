@@ -19,7 +19,7 @@ echo "============================================================"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 1. 
+# 1. Activation des ports requis
 # -----------------------------------------------------------------------------
 echo ">>> Etape 1/X : Configuration du firewall UFW"
 
@@ -29,14 +29,21 @@ apt-get install -y ufw
 ufw allow 80/tcp
 ufw allow 32168/tcp
 
+ufw --force enable
 ufw status verbose
 
 echo ""
 
 # -----------------------------------------------------------------------------
-# 2. 
+# 2. Installation .NET 9
 # -----------------------------------------------------------------------------
+echo ">>> Etape 2/X : Installation .NET 9"
 
+apt-get update
+add-apt-repository ppa:dotnet/backports
+apt-get install -y dotnet-sdk-9.0
+
+dotnet --version
 
 # -----------------------------------------------------------------------------
 # 3. 

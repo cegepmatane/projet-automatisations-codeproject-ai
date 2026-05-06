@@ -19,7 +19,7 @@ echo "============================================================"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 1. 
+# 1. Desactivation des ports
 # -----------------------------------------------------------------------------
 echo ">>> Etape 1/X : Configuration du firewall UFW"
 
@@ -37,9 +37,16 @@ ufw status verbose
 echo ""
 
 # -----------------------------------------------------------------------------
-# 2. 
+# 2. Desinstallation .NET 9
 # -----------------------------------------------------------------------------
+echo ">>> Etape 2/X : Desinstallation .NET 9"
 
+apt-get remove --purge -y dotnet-sdk-9.0
+apt-get autoremove -y
+add-apt-repository --remove ppa:dotnet/backports
+apt-get update
+
+dotnet --version # devrait afficher command not found
 
 # -----------------------------------------------------------------------------
 # 3. 
