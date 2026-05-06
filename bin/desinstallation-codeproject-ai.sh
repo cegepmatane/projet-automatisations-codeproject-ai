@@ -27,9 +27,9 @@ ufw delete allow 32168/tcp || true
 read -p ">>> Voulez-vous supprimer le port 80 (HTTP) ? [y/N] " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
   ufw delete allow 80/tcp || true
-  echo "Port 80 supprime"
+  echo "Port 80 supprime (OK)"
 else
-  echo "Port 80 conserve"
+  echo "Port 80 conserve (OK)"
 fi
 
 ufw status verbose
@@ -55,9 +55,9 @@ echo ">>> Desinstallation unzip..."
 read -p ">>> Voulez-vous desinstaller unzip ? [y/N] " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
   apt remove -y unzip || true
-  echo "unzip desinstalle"
+  echo "unzip desinstalle (OK)"
 else
-  echo "unzip conserve"
+  echo "unzip conserve (OK)"
 fi
 
 apt-get update
@@ -76,19 +76,18 @@ dpkg -r codeproject.ai-server || true
 
 # Dossiers d'installation
 rm -rf /usr/bin/codeproject.ai-server-2.9.5
-
 # Données et configuration utilisateur
 rm -rf /opt/codeproject/ai 2>/dev/null || true
 rm -rf ~/.codeproject 2>/dev/null || true
-
 # Raccourci
 rm -f /usr/local/bin/codeproject.ai-server 2>/dev/null || true
-
 # Fichier de service systemd résiduel
 rm -f /etc/systemd/system/codeproject.ai-server.service 2>/dev/null || true
 systemctl daemon-reload 2>/dev/null || true
+# Dossier résiduel du projet
+rm -rf /etc/codeproject 2>/dev/null || true
 
-echo "CodeProject.AI-Server desinstalle"
+echo "CodeProject.AI-Server desinstalle (OK)"
 
 echo ""
 
