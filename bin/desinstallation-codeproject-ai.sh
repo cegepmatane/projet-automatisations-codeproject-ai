@@ -48,10 +48,9 @@ apt-get update
 
 dotnet --version || echo "dotnet supprimé (OK)"
 
-# -----------------------------------------------------------------------------
-# 3. Desinstallation de CodeProject.AI-Server
-# -----------------------------------------------------------------------------
-echo ">>> Etape 3/X : Desinstallation de CodeProject.AI-Server"
+echo ""
+
+echo ">>> Desinstallation unzip..."
 
 read -p ">>> Voulez-vous desinstaller unzip ? [y/N] " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
@@ -62,6 +61,14 @@ else
 fi
 
 apt-get update
+
+echo ""
+
+# -----------------------------------------------------------------------------
+# 3. Desinstallation de CodeProject.AI-Server
+# -----------------------------------------------------------------------------
+echo ">>> Etape 3/X : Desinstallation de CodeProject.AI-Server"
+
 
 
 # -----------------------------------------------------------------------------

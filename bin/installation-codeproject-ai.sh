@@ -35,9 +35,9 @@ ufw status verbose
 echo ""
 
 # -----------------------------------------------------------------------------
-# 2. Installation .NET 9
+# 2. Installation .NET 9 et unzip
 # -----------------------------------------------------------------------------
-echo ">>> Etape 2/X : Installation .NET 9"
+echo ">>> Etape 2/X : Installation de .NET 9"
 
 apt-get update
 yes | add-apt-repository ppa:dotnet/backports
@@ -46,13 +46,23 @@ apt-get install -y dotnet-sdk-9.0
 
 dotnet --version
 
+echo ""
+
+echo ">>> Installation de unzip"
+
+apt-get update
+apt install -y unzip
+
+echo ""
+
 # -----------------------------------------------------------------------------
 # 3. Installation de CodeProject.AI-Server
 # -----------------------------------------------------------------------------
 echo ">>> Etape 3/X : Installation de CodeProject.AI-Server"
 
-apt-get update
-apt install -y unzip
+wget https://codeproject-ai-bunny.b-cdn.net/server/installers/linux/codeproject.ai-server_2.9.5_Ubuntu_x64.zip
+
+ls -l codeproject.ai-server_2.9.5_Ubuntu_x64.zip
 
 unzip codeproject.ai-server_2.9.5_Ubuntu_x64.zip
 ls
@@ -63,6 +73,8 @@ apt --fix-broken install -y
 
 pushd "/usr/bin/codeproject.ai-server-2.9.5/" && bash setup.sh && popd
 pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
+
+echo ""
 
 # -----------------------------------------------------------------------------
 # 4. 
