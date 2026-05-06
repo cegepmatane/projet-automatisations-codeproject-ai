@@ -42,6 +42,7 @@ echo ""
 echo ">>> Etape 2/X : Desinstallation .NET 9"
 
 # Pour pas avoir de conflits
+echo "arret et desactivation du service..."
 systemctl stop codeproject.ai-server 2>/dev/null || true
 systemctl disable codeproject.ai-server 2>/dev/null || true
 
@@ -63,7 +64,6 @@ echo ""
 # -----------------------------------------------------------------------------
 # 3. Desinstallation unzip
 # -----------------------------------------------------------------------------
-
 echo ">>> Etape 3/X Desinstallation unzip..."
 
 read -p ">>> Voulez-vous desinstaller unzip ? [y/N] " answer
