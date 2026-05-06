@@ -47,9 +47,22 @@ apt-get install -y dotnet-sdk-9.0
 dotnet --version
 
 # -----------------------------------------------------------------------------
-# 3. 
+# 3. Installation de CodeProject.AI-Server
 # -----------------------------------------------------------------------------
+echo ">>> Etape 3/X : Installation de CodeProject.AI-Server"
 
+apt-get update
+apt install -y unzip
+
+unzip codeproject.ai-server_2.9.5_Ubuntu_x64.zip
+ls
+rm codeproject.ai-server_2.9.5_Ubuntu_x64.zip
+
+dpkg -i codeproject.ai-server_2.9.5_Ubuntu_x64.deb
+apt --fix-broken install -y
+
+pushd "/usr/bin/codeproject.ai-server-2.9.5/" && bash setup.sh && popd
+pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
 
 # -----------------------------------------------------------------------------
 # 4. 
