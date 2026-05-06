@@ -69,7 +69,28 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">>> Etape 3/X : Desinstallation de CodeProject.AI-Server"
 
+systemctl stop codeproject.ai-server 2>/dev/null || true
+systemctl disable codeproject.ai-server 2>/dev/null || true
 
+dpkg -r codeproject.ai-server || true
+
+# Dossiers d'installation
+rm -rf /usr/bin/codeproject.ai-server-2.9.5
+
+# Données et configuration utilisateur
+rm -rf /opt/codeproject/ai 2>/dev/null || true
+rm -rf ~/.codeproject 2>/dev/null || true
+
+# Raccourci
+rm -f /usr/local/bin/codeproject.ai-server 2>/dev/null || true
+
+# Fichier de service systemd résiduel
+rm -f /etc/systemd/system/codeproject.ai-server.service 2>/dev/null || true
+systemctl daemon-reload 2>/dev/null || true
+
+echo "CodeProject.AI-Server desinstalle"
+
+echo ""
 
 # -----------------------------------------------------------------------------
 # 4. 
