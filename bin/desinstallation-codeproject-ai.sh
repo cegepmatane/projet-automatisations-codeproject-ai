@@ -41,16 +41,20 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">>> Etape 2/X : Desinstallation .NET 9"
 
-apt-get remove --purge -y dotnet-sdk-9.0 || true
+apt-get purge -y dotnet* || true
 apt-get autoremove -y
 yes | add-apt-repository --remove ppa:dotnet/backports || true
 apt-get update
 
-dotnet --version || echo "dotnet supprimé (OK)"
+dotnet --version 2>/dev/null && echo "dotnet ENCORE PRESENT" || echo "dotnet supprimé (OK)"
 
 echo ""
 
-echo ">>> Desinstallation unzip..."
+# -----------------------------------------------------------------------------
+# 3. Desinstallation unzip
+# -----------------------------------------------------------------------------
+
+echo ">>> Etape 3/X Desinstallation unzip..."
 
 read -p ">>> Voulez-vous desinstaller unzip ? [y/N] " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
@@ -65,9 +69,9 @@ apt-get update
 echo ""
 
 # -----------------------------------------------------------------------------
-# 3. Desinstallation de CodeProject.AI-Server
+# 4. Desinstallation de CodeProject.AI-Server
 # -----------------------------------------------------------------------------
-echo ">>> Etape 3/X : Desinstallation de CodeProject.AI-Server"
+echo ">>> Etape 4/X : Desinstallation de CodeProject.AI-Server"
 
 systemctl stop codeproject.ai-server 2>/dev/null || true
 systemctl disable codeproject.ai-server 2>/dev/null || true
@@ -92,5 +96,5 @@ echo "CodeProject.AI-Server desinstalle (OK)"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 4. 
+# 5. 
 # -----------------------------------------------------------------------------
