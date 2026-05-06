@@ -43,7 +43,7 @@ echo ">>> Etape 2/X : Desinstallation .NET 9"
 
 apt-get remove --purge -y dotnet-sdk-9.0
 apt-get autoremove -y
-add-apt-repository -y --remove ppa:dotnet/backports
+yes | add-apt-repository --remove ppa:dotnet/backports
 apt-get update
 
 dotnet --version || echo "dotnet supprimé (OK)"
