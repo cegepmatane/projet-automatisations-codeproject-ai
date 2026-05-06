@@ -2,7 +2,7 @@
 # =============================================================================
 # Script d'installation de Codeproject.AI
 # Configure : [A DETERMINER]
-# Usage : sudo bash <(curl -fsSL https://raw.githubusercontent.com/cegepmatane/projet-automatisations-enderbird/main/bin/installation-codeproject-ai.sh)
+# Usage : tmp=$(mktemp) && curl -fsSL https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
 # =============================================================================
 
 set -e
@@ -26,12 +26,9 @@ echo ">>> Etape 1/X : Configuration du firewall UFW"
 apt-get update
 apt-get install -y ufw
 
-ufw --force reset
-
 ufw allow 80/tcp
 ufw allow 32168/tcp
 
-ufw --force enable
 ufw status verbose
 
 echo ""
