@@ -120,6 +120,7 @@ echo ">>> Etape 6/X : Suppression configurations Nginx"
 
 rm -f /etc/nginx/sites-enabled/codeproject-ai
 rm -f /etc/nginx/sites-available/codeproject-ai
+ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 nginx -t && systemctl reload nginx
 systemctl restart nginx 2>/dev/null || true

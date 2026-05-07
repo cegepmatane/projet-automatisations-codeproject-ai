@@ -141,6 +141,7 @@ server {
 
 EOF
 
+rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
 
 nginx -t && systemctl reload nginx
