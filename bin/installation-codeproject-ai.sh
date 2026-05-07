@@ -95,15 +95,16 @@ apt-get update
 apt install -y nginx apache2-utils
 
 sudo mkdir -p /etc/nginx/codeproject-ai/
-sudo touch /etc/nginx/codeproject-ai/.htpasswd
+
+mkdir -p /etc/nginx/codeproject-ai/
 
 read -s -p ">>> Mot de passe pour l'utilisateur admin: " PASSWORD
 echo
-if [ ! -f /etc/nginx/codeproject-ai/.htpasswd ]; then
-  htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
-else
-  htpasswd -b /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
-fi
+
+htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
+
+chmod 640 /etc/nginx/codeproject-ai/.htpasswd
+chown root:www-data /etc/nginx/codeproject-ai/.htpasswd
 
 echo "Authentification HTTP configuree (OK)"
 
