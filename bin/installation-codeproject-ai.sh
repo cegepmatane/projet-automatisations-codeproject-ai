@@ -19,6 +19,8 @@ echo "============================================================"
 
 echo ""
 
+SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
+
 # -----------------------------------------------------------------------------
 # 1. Activation des ports requis
 # -----------------------------------------------------------------------------
@@ -80,7 +82,7 @@ echo "CodeProject.AI-Server installé (OK)"
 systemctl start codeproject.ai-server
 systemctl enable codeproject.ai-server
 
-echo "service CodeProject.AI-Server ouvert sur http://localhost:32168"
+echo "service CodeProject.AI-Server ouvert sur http://localhost:32168 ou http://$SERVER_IP:32168"
 
 echo ""
 
@@ -108,15 +110,50 @@ echo "Authentification HTTP configuree (OK)"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 6. 
+# 6. Ajout configurations Nginx
 # -----------------------------------------------------------------------------
+echo ">>> Etape 6/X : Ajout configurations Nginx"
 
-cat > /etc/nginx/sites-available/codeproject-ai << 'EOF'
+cat > /etc/nginx/sites-available/codeproject-ai << EOF
+limit_req_zone \$binary_remote_addr zone=limite_adresses:10m rate=10r/s;
 
+server {
+  listen 80;
+  server_name $SERVER_IP;
+
+  limit_req zone=limite_adresses burst=20 nodelay;
+
+  client_max_body_size 20M;
+
+  location / {
+    root /var/www/html/codeproject-ai;
+    index index.html;
+  }
+
+  location /codeproject/ {
+    auth_basic "Restricted Access to the Project";
+    auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
+
+    proxy_pass http://$SERVER_IP:32168/;
+
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+
+    proxy_connect_timeout 300s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+  }
+}
 EOF
 
 ln -s /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
 nginx -t && systemctl reload nginx
+
+echo "Configurations Nginx ajoutees (OK)"
+
+echo ""
 
 # -----------------------------------------------------------------------------
 # 6. 
