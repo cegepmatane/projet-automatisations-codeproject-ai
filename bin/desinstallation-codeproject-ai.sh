@@ -105,14 +105,34 @@ echo ""
 # -----------------------------------------------------------------------------
 # 5. Suppression authentification HTTP
 # -----------------------------------------------------------------------------
+echo ">>> Etape 5/X : Suppression authentification HTTP"
+
+rm -rf /etc/nginx/codeproject-ai
+
+echo "Configurations authentification HTTP supprime (OK)"
+
+echo ""
+
+# -----------------------------------------------------------------------------
+# 6. Suppression configurations Nginx
+# -----------------------------------------------------------------------------
 echo ">>> Etape 6/X : Suppression configurations Nginx"
 
 rm -f /etc/nginx/sites-enabled/codeproject-ai
 rm -f /etc/nginx/sites-available/codeproject-ai
-rm -rf /etc/nginx/codeproject-ai
 
 systemctl reload nginx
 
 echo "Configurations Nginx supprime (OK)"
+
+echo ""
+
+# -----------------------------------------------------------------------------
+# 7. Suppression fichier index.html
+# -----------------------------------------------------------------------------
+echo ">>> Etape 7/X : Suppression fichier index.html"
+
+rm -rf /var/www/html/codeproject-ai/index.html
+rm -rf /var/www/html/codeproject-ai
 
 echo ""
