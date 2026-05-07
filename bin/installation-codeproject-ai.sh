@@ -132,7 +132,7 @@ server {
   # Nginx cherche le fichier correspondant dans /var/www/html.
   # Si l'URL est "/" il sert index.html.
   location / {
-    root /var/www/html/codeproject-ai;
+    root /var/www/html;
     index index.html;
   }
 
