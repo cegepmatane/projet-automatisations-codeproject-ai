@@ -85,9 +85,9 @@ echo "service CodeProject.AI-Server ouvert sur http://localhost:32168"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 5. Authentification HTTP
+# 5. Ajout authentification HTTP
 # -----------------------------------------------------------------------------
-echo ">>> Etape 5/X : Authentification HTTP"
+echo ">>> Etape 5/X : Ajout authentification HTTP"
 
 apt-get update
 apt install -y nginx apache2-utils
@@ -104,6 +104,8 @@ else
 fi
 
 echo "Authentification HTTP configuree (OK)"
+
+echo ""
 
 # -----------------------------------------------------------------------------
 # 6. 

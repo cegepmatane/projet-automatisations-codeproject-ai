@@ -103,10 +103,14 @@ echo "CodeProject.AI-Server desinstalle (OK)"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 5. 
+# 5. Suppression authentification HTTP
 # -----------------------------------------------------------------------------
+echo ">>> Etape 5/X : Suppression authentification HTTP"
 
 rm -f /etc/nginx/codeproject-ai/.htpasswd
+rm -rf /etc/nginx/codeproject-ai/
+
+echo "Authentification HTTP supprime (OK)"
 
 echo ""
 
