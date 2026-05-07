@@ -19,6 +19,8 @@ echo "============================================================"
 
 echo ""
 
+SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
+
 # -----------------------------------------------------------------------------
 # 1. Activation des ports requis
 # -----------------------------------------------------------------------------
@@ -106,11 +108,11 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">>> Etape 6 : Nginx config"
 
-cat > /etc/nginx/sites-available/codeproject-ai << 'EOF'
+cat > /etc/nginx/sites-available/codeproject-ai << EOF
 
 server {
     listen 80;
-    server_name _;
+    server_name $SERVER_IP;
 
     # site principal
     location / {
@@ -131,9 +133,9 @@ server {
 
         proxy_pass http://127.0.0.1:32168/;
 
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 }
 
