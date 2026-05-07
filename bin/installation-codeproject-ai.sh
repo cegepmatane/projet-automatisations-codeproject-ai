@@ -94,8 +94,6 @@ echo ">>> Etape 5/X : Ajout authentification HTTP"
 apt-get update
 apt install -y nginx apache2-utils
 
-sudo mkdir -p /etc/nginx/codeproject-ai/
-
 mkdir -p /etc/nginx/codeproject-ai/
 
 read -s -p ">>> Mot de passe pour l'utilisateur admin: " PASSWORD
@@ -127,15 +125,10 @@ server {
   client_max_body_size 20M;
 
   location / {
-    root /var/www/html/codeproject-ai;
-    index index.html;
-  }
-
-  location /codeproject/ {
     auth_basic "Restricted Access to the Project";
     auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
 
-    proxy_pass http://$SERVER_IP:32168/;
+    proxy_pass http://127.0.0.1:32168/;
 
     proxy_set_header Host \$host;
     proxy_set_header X-Real-IP \$remote_addr;
@@ -149,7 +142,7 @@ server {
 }
 EOF
 
-ln -s /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
+ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
 nginx -t && systemctl reload nginx
 
 echo "Configurations Nginx ajoutees (OK)"
