@@ -85,11 +85,25 @@ echo "service CodeProject.AI-Server ouvert sur http://localhost:32168"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 5. 
+# 5. Authentification HTTP
 # -----------------------------------------------------------------------------
+echo ">>> Etape 5/X : Authentification HTTP"
 
+apt-get update
 apt install -y nginx apache2-utils
-htpasswd -c /etc/nginx/.htpasswd admin
+
+sudo mkdir -p /etc/nginx/codeproject-ai/
+sudo touch /etc/nginx/codeproject-ai/.htpasswd
+
+read -s -p ">>> Mot de passe pour l'utilisateur admin: " PASSWORD
+echo
+if [ ! -f /etc/nginx/codeproject-ai/.htpasswd ]; then
+  htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
+else
+  htpasswd -b /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
+fi
+
+echo "Authentification HTTP configuree (OK)"
 
 # -----------------------------------------------------------------------------
 # 6. 
