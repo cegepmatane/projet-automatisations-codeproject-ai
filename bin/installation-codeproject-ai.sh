@@ -19,8 +19,6 @@ echo "============================================================"
 
 echo ""
 
-SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
-
 # -----------------------------------------------------------------------------
 # 1. Activation des ports requis
 # -----------------------------------------------------------------------------
@@ -80,7 +78,7 @@ echo "CodeProject.AI-Server installé (OK)"
 systemctl start codeproject.ai-server
 systemctl enable codeproject.ai-server
 
-echo "service CodeProject.AI-Server ouvert sur http://localhost:32168 ou http://$SERVER_IP:32168"
+echo "service CodeProject.AI-Server installé sur http://localhost:32168 (OK)"
 
 echo ""
 
@@ -107,61 +105,60 @@ echo "Authentification HTTP configuree (OK)"
 echo ""
 
 # -----------------------------------------------------------------------------
+# Force CodeProject.AI à écouter seulement sur localhost
+# -----------------------------------------------------------------------------
+echo ">>> Configuration localhost pour CodeProject.AI"
+
+mkdir -p /etc/systemd/system/codeproject.ai-server.service.d
+
+cat > /etc/systemd/system/codeproject.ai-server.service.d/override.conf << EOF
+[Service]
+Environment=ASPNETCORE_URLS=http://127.0.0.1:32169
+EOF
+
+systemctl daemon-reload
+systemctl restart codeproject.ai-server
+
+echo "Verification du port :"
+ss -tulpn | grep 32168 || true
+
+echo ""
+echo "Configuration localhost appliquee (OK)"
+
+
+# -----------------------------------------------------------------------------
 # 6. Ajout configurations Nginx
 # -----------------------------------------------------------------------------
 echo ">>> Etape 6/X : Ajout configurations Nginx"
 
-cat > /etc/nginx/sites-available/codeproject-ai << EOF
-# Garde en mémoire l'IP de chaque client dans une zone de 10 Mo.
-# Limite à 10 requêtes par seconde par IP.
-limit_req_zone \$binary_remote_addr zone=limite_adresses:10m rate=10r/s;
+cat > /etc/nginx/sites-available/codeproject-ai << 'EOF'
 
 server {
-  listen 80;
-  server_name ${SERVER_IP};
+    listen 80;
+    server_name _;
 
-  # Autorise jusqu'à 20 requêtes en attente (burst).
-  # nodelay = pas de délai artificiel sur ces 20 requêtes.
-  limit_req zone=limite_adresses burst=20 nodelay;
+    location / {
+        root /var/www/html;
+        index index.html;
+    }
+}
 
-  # Taille max d'un fichier envoyé (upload d'image, etc.)
-  client_max_body_size 20M;
+server {
+    listen 32168;
 
-  # ── 1. Site public ────────────────────────────────────────────────
-  # Toute URL qui ne commence pas par /codeproject/ arrive ici.
-  # Nginx cherche le fichier correspondant dans /var/www/html.
-  # Si l'URL est "/" il sert index.html.
-  location / {
-    root /var/www/html;
-    index index.html;
-  }
-
-  # ── 2. App protégée ───────────────────────────────────────────────
-  # Toute URL commençant par /codeproject/ déclenche ce bloc.
-  location /codeproject/ {
-
-    # Demande un mot de passe avant d'aller plus loin.
-    # Le message "Restricted Access..." s'affiche dans la popup du navigateur.
-    auth_basic "Restricted Access to the Project";
+    auth_basic "CodeProject AI Admin";
     auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
 
-    # Redirige la requête vers CodeProject.AI qui tourne en local.
-    # Le "/" final est important : il enlève /codeproject/ du chemin
-    # avant de le transmettre à l'app (ex: /codeproject/v1/detect → /v1/detect).
-    proxy_pass http://127.0.0.1:32168/;
+    location / {
+        proxy_pass http://127.0.0.1:32169;
 
-    # Transmet les vraies informations du client à l'app.
-    proxy_set_header Host \$host;
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto \$scheme;
-
-    # Délais longs pour les requêtes d'IA (inférence peut prendre du temps).
-    proxy_connect_timeout 300s;
-    proxy_send_timeout 300s;
-    proxy_read_timeout 300s;
-  }
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 }
+
 EOF
 
 ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
@@ -185,3 +182,9 @@ EOF
 echo "Fichier index.html ajoute (OK)"
 
 echo ""
+
+# -----------------------------------------------------------------------------
+# 4. Firewall
+# -----------------------------------------------------------------------------
+#echo "NOTE: recommandé de fermer accès direct"
+#echo "sudo ufw delete allow 32168/tcp"
