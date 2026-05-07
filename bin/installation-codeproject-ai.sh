@@ -182,4 +182,6 @@ cat > /var/www/html/codeproject-ai/index.html << EOF
 test
 EOF
 
+echo "Fichier index.html ajoute (OK)"
+
 echo ""
