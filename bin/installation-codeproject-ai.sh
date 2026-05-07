@@ -75,7 +75,6 @@ pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
 
 echo "CodeProject.AI-Server installé (OK)"
 
-systemctl start codeproject.ai-server
 systemctl enable codeproject.ai-server
 
 echo "service CodeProject.AI-Server installé sur http://localhost:32168 (OK)"
@@ -83,16 +82,16 @@ echo "service CodeProject.AI-Server installé sur http://localhost:32168 (OK)"
 echo ""
 
 # -----------------------------------------------------------------------------
-# 5. Ajout authentification HTTP
+# 5. Nginx + auth
 # -----------------------------------------------------------------------------
-echo ">>> Etape 5/X : Ajout authentification HTTP"
+echo ">>> Etape 5 : Nginx + auth"
 
 apt-get update
 apt install -y nginx apache2-utils
 
 mkdir -p /etc/nginx/codeproject-ai/
 
-read -s -p ">>> Mot de passe pour l'utilisateur admin: " PASSWORD
+read -s -p "Mot de passe admin: " PASSWORD
 echo
 
 htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
@@ -100,36 +99,12 @@ htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
 chmod 640 /etc/nginx/codeproject-ai/.htpasswd
 chown root:www-data /etc/nginx/codeproject-ai/.htpasswd
 
-echo "Authentification HTTP configuree (OK)"
-
 echo ""
 
 # -----------------------------------------------------------------------------
-# Force CodeProject.AI à écouter seulement sur localhost
+# 6. Nginx config CLEAN
 # -----------------------------------------------------------------------------
-echo ">>> Configuration localhost pour CodeProject.AI"
-
-mkdir -p /etc/systemd/system/codeproject.ai-server.service.d
-
-cat > /etc/systemd/system/codeproject.ai-server.service.d/override.conf << EOF
-[Service]
-Environment=ASPNETCORE_URLS=http://127.0.0.1:32169
-EOF
-
-systemctl daemon-reload
-systemctl restart codeproject.ai-server
-
-echo "Verification du port :"
-ss -tulpn | grep 32168 || true
-
-echo ""
-echo "Configuration localhost appliquee (OK)"
-
-
-# -----------------------------------------------------------------------------
-# 6. Ajout configurations Nginx
-# -----------------------------------------------------------------------------
-echo ">>> Etape 6/X : Ajout configurations Nginx"
+echo ">>> Etape 6 : Nginx config"
 
 cat > /etc/nginx/sites-available/codeproject-ai << 'EOF'
 
@@ -137,54 +112,63 @@ server {
     listen 80;
     server_name _;
 
+    # site principal
     location / {
         root /var/www/html;
         index index.html;
     }
-}
 
-server {
-    listen 32168;
+    # page statique dédiée
+    location /codeproject-ai/ {
+        root /var/www/html;
+        index index.html;
+    }
 
-    auth_basic "CodeProject AI Admin";
-    auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
+    # backend AI protégé
+    location /ai/ {
+        auth_basic "Admin Only";
+        auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
 
-    location / {
-        proxy_pass http://127.0.0.1:32169;
+        proxy_pass http://127.0.0.1:32168/;
 
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 
 EOF
 
 ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
-nginx -t && systemctl reload nginx
-systemctl restart nginx
 
-echo "Configurations Nginx ajoutees (OK)"
+nginx -t && systemctl reload nginx
+
+echo "OK nginx configuré"
 
 echo ""
 
 # -----------------------------------------------------------------------------
-# 7. Ajout fichier index.html
+# 7. index.html
 # -----------------------------------------------------------------------------
-echo ">>> Etape 7/X : Ajout fichier index.html"
+echo ">>> Etape 7 : index.html"
 
 mkdir -p /var/www/html/codeproject-ai
+
 cat > /var/www/html/codeproject-ai/index.html << EOF
-test
+CodeProject AI page OK
 EOF
 
-echo "Fichier index.html ajoute (OK)"
+echo "OK index.html"
 
 echo ""
 
 # -----------------------------------------------------------------------------
-# 4. Firewall
+# 8. sécurité optionnelle
 # -----------------------------------------------------------------------------
-#echo "NOTE: recommandé de fermer accès direct"
-#echo "sudo ufw delete allow 32168/tcp"
+echo ">>> Etape 8 : recommandation sécurité"
+
+echo "Optionnel: fermer accès direct"
+echo "sudo ufw delete allow 32168/tcp"
+
+echo ""
+echo "INSTALLATION TERMINÉE"

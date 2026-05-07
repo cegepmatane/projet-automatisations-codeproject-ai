@@ -44,6 +44,7 @@ echo ">>> Etape 2/X : Desinstallation .NET 9"
 # Pour pas avoir de conflits
 echo "arret du service..."
 systemctl stop codeproject.ai-server 2>/dev/null || true
+systemctl disable codeproject.ai-server 2>/dev/null || true
 
 apt-get purge -y dotnet-sdk-9.0 || true
 apt-get purge -y dotnet-host-9.0 || true
@@ -97,10 +98,6 @@ systemctl daemon-reload 2>/dev/null || true
 # Dossier résiduel du projet
 rm -rf /etc/codeproject 2>/dev/null || true
 
-systemctl stop codeproject.ai-server 2>/dev/null || true
-systemctl disable codeproject.ai-server 2>/dev/null || true
-rm -rf /etc/systemd/system/codeproject.ai-server.service.d
-
 echo "CodeProject.AI-Server desinstalle (OK)"
 
 echo ""
@@ -124,7 +121,7 @@ echo ">>> Etape 6/X : Suppression configurations Nginx"
 rm -f /etc/nginx/sites-enabled/codeproject-ai
 rm -f /etc/nginx/sites-available/codeproject-ai
 
-nginx -t && systemctl reload nginx 2>/dev/null || true
+nginx -t && systemctl reload nginx
 systemctl restart nginx 2>/dev/null || true
 
 echo "Configurations Nginx supprime (OK)"
