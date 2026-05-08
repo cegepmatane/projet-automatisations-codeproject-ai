@@ -31,6 +31,7 @@ apt-get install -y ufw
 
 ufw allow 80/tcp
 ufw allow 8080/tcp
+ufw allow 32168/tcp
 
 ufw --force enable
 ufw status verbose
@@ -77,6 +78,7 @@ pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
 
 echo "CodeProject.AI-Server installé (OK)"
 
+systemctl start codeproject.ai-server
 systemctl enable codeproject.ai-server
 
 echo "service CodeProject.AI-Server installé sur http://localhost:32168 (OK)"
@@ -117,7 +119,7 @@ limit_req_zone \$binary_remote_addr zone=limite_adresses:10m rate=10r/s;
 
 server {
     listen 80;
-    server_name $SERVEUR;
+    server_name $SERVER_IP;
 
     # 1 - Public site (no auth)
     location /codeproject-ai/ {
@@ -128,7 +130,7 @@ server {
     
 server {
     listen 8080;
-    server_name $SERVEUR;
+    server_name $SERVER_IP;
     
     # applique la rate limite
     # met jusqu'a 20 requetes dans la file d'attente
@@ -161,7 +163,7 @@ server {
 
 EOF
 
-rm -f /etc/nginx/sites-enabled/default
+# rm -f /etc/nginx/sites-enabled/defaultk
 ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
 
 nginx -t && systemctl restart nginx
@@ -221,4 +223,9 @@ echo "Optionnel: fermer accès direct"
 echo "sudo ufw delete allow 32168/tcp"
 
 echo ""
-echo "INSTALLATION TERMINÉE"
+echo ""
+
+
+# -----------------------------------------------------------------------------
+# INSTALLATION TERMINÉE (on peut starter le service)
+# -----------------------------------------------------------------------------
