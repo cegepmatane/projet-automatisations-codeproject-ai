@@ -220,11 +220,14 @@ echo "Optionnel: fermer accès direct"
 echo "sudo ufw delete allow 32168/tcp"
 
 echo ""
-echo ""
 
 
 # -----------------------------------------------------------------------------
 # INSTALLATION TERMINÉE (on peut starter le service)
 # -----------------------------------------------------------------------------
+echo ">>> INSTALLATION TERMINEE!"
+
 systemctl start codeproject.ai-server
 echo "service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
+
+echo ""
