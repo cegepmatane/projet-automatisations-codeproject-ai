@@ -76,12 +76,9 @@ rm -f codeproject.ai-server_2.9.5_Ubuntu_x64.deb
 pushd "/usr/bin/codeproject.ai-server-2.9.5/" && bash setup.sh && popd
 pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
 
-echo "CodeProject.AI-Server installé (OK)"
-
-systemctl start codeproject.ai-server
 systemctl enable codeproject.ai-server
 
-echo "service CodeProject.AI-Server installé sur http://localhost:32168 (OK)"
+echo "CodeProject.AI-Server installe (OK)"
 
 echo ""
 
@@ -229,3 +226,5 @@ echo ""
 # -----------------------------------------------------------------------------
 # INSTALLATION TERMINÉE (on peut starter le service)
 # -----------------------------------------------------------------------------
+systemctl start codeproject.ai-server
+echo "service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
