@@ -31,7 +31,6 @@ apt-get install -y ufw
 
 ufw allow 80/tcp
 ufw allow 8080/tcp
-ufw allow 32168/tcp
 
 ufw --force enable
 ufw status verbose
@@ -173,9 +172,7 @@ server {
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
-
     }
-
 }
 
 EOF
@@ -197,6 +194,7 @@ echo ">>> Etape 7 : index.html"
 mkdir -p /var/www/html/codeproject-ai
 
 cat > /var/www/html/codeproject-ai/index.html << EOF
+
 <html>
     <body>
     Detect the scene in this file: <input id="image" type="file" />
@@ -225,6 +223,7 @@ cat > /var/www/html/codeproject-ai/index.html << EOF
     </script>
     </body>
 </html>
+
 EOF
 
 echo "OK index.html"
@@ -249,5 +248,7 @@ echo ">>> INSTALLATION TERMINEE!"
 
 systemctl start codeproject.ai-server
 echo "service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
+echo "ouvrir http://$SERVER_IP:8080 pour consulter le dashboard (OK)"
+echo "et ouvrir http://$SERVER_IP/codeproject-ai/ pour faire une détecton d'image (OK)"
 
 echo ""

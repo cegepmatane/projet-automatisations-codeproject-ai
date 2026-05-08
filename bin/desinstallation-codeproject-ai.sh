@@ -24,7 +24,6 @@ echo ""
 echo ">>> Etape 1/X : Configuration du firewall UFW"
 
 ufw delete allow 8080/tcp || true
-ufw delete allow 32168/tcp || true
 
 read -p ">>> Voulez-vous supprimer le port 80 (HTTP) ? [y/N] " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
