@@ -30,7 +30,7 @@ apt-get update
 apt-get install -y ufw
 
 ufw allow 80/tcp
-ufw allow 32168/tcp
+ufw allow 8080/tcp
 
 ufw --force enable
 ufw status verbose
@@ -110,41 +110,61 @@ echo ">>> Etape 6 : Nginx config"
 
 cat > /etc/nginx/sites-available/codeproject-ai << EOF
 
+# definit la rate limite
+# conserve les IPs dans la variable \$binary_remote_addr de 10 megabytes
+# limite a 10 requetes par secondes
+limit_req_zone \$binary_remote_addr zone=limite_adresses:10m rate=10r/s;
+
 server {
     listen 80;
-    server_name $SERVER_IP;
+    server_name $SERVEUR;
 
-    # site principal
-    location / {
-        root /var/www/html;
-        index index.html;
-    }
-
-    # page statique dédiée
+    # 1 - Public site (no auth)
     location /codeproject-ai/ {
         root /var/www/html;
         index index.html;
     }
+}   
+    
+server {
+    listen 8080;
+    server_name $SERVEUR;
+    
+    # applique la rate limite
+    # met jusqu'a 20 requetes dans la file d'attente
+    # nodelay fait en sorte que les requetes dans la file d'attente n'aient pas de delais,
+    # ce qui evite que l'application apparaisse lante
+    limit_req zone=limite_adresses burst=20 nodelay;
 
-    # backend AI protégé
-    location /ai/ {
-        auth_basic "Admin Only";
-        auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
+    client_max_body_size 20M;
+    
+    auth_basic "Admin Only";
+    auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
 
+    # 2 - Protected app
+    location / {
         proxy_pass http://127.0.0.1:32168/;
 
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
     }
-}
+}  
 
 EOF
 
 rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
 
-nginx -t && systemctl reload nginx
+nginx -t && systemctl restart nginx
 
 echo "OK nginx configuré"
 

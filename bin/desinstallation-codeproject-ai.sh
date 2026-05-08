@@ -23,7 +23,7 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">>> Etape 1/X : Configuration du firewall UFW"
 
-ufw delete allow 32168/tcp || true
+ufw delete allow 8080/tcp || true
 read -p ">>> Voulez-vous supprimer le port 80 (HTTP) ? [y/N] " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
   ufw delete allow 80/tcp || true
@@ -122,8 +122,7 @@ rm -f /etc/nginx/sites-enabled/codeproject-ai
 rm -f /etc/nginx/sites-available/codeproject-ai
 ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-nginx -t && systemctl reload nginx
-systemctl restart nginx 2>/dev/null || true
+nginx -t && systemctl restart nginx
 
 echo "Configurations Nginx supprime (OK)"
 
