@@ -178,7 +178,34 @@ echo ">>> Etape 7 : index.html"
 mkdir -p /var/www/html/codeproject-ai
 
 cat > /var/www/html/codeproject-ai/index.html << EOF
-CodeProject AI page OK
+<html>
+    <body>
+    Detect the scene in this file: <input id="image" type="file" />
+    <input type="button" value="Detect Scene" onclick="detectScene(image)" />
+
+    <script>
+    function detectScene(fileChooser) {
+        var formData = new FormData();
+        formData.append('image', fileChooser.files[0]);
+
+        fetch('http://<votre adress ip>/codeproject/v1/vision/detection', {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+
+            const pred = data.predictions?.[0];
+
+            if (pred) {
+                console.log(pred.label, pred.confidence);
+            }
+        });
+    }
+    </script>
+    </body>
+</html>
 EOF
 
 echo "OK index.html"
