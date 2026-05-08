@@ -234,7 +234,16 @@ echo ""
 # -----------------------------------------------------------------------------
 echo ">>> INSTALLATION TERMINEE!"
 
+sed -i '0,/"AutoStart": true/s//"AutoStart": false/' \
+/usr/bin/codeproject.ai-server-2.9.5/modules/FaceProcessing/modulesettings.json
+sed -i '0,/"AutoStart": true/s//"AutoStart": false/' \
+/usr/bin/codeproject.ai-server-2.9.5/modules/ObjectDetectionYOLOv5Net/modulesettings.json
+
+rm -rf /usr/bin/codeproject.ai-server-2.9.5/modules/FaceProcessing
+rm -rf /usr/bin/codeproject.ai-server-2.9.5/modules/ObjectDetectionYOLOv5Net
+
 systemctl start codeproject.ai-server
+
 echo "service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
 echo "ouvrir http://$SERVER_IP:8080 pour consulter le dashboard (OK)"
 echo "et ouvrir http://$SERVER_IP/codeproject-ai/ pour faire une détecton d'image (OK)"
