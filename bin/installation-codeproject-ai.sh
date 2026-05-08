@@ -177,7 +177,6 @@ server {
 
 EOF
 
-# rm -f /etc/nginx/sites-enabled/defaultk
 ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
 
 nginx -t && systemctl restart nginx
@@ -229,17 +228,6 @@ EOF
 echo "OK index.html"
 
 echo ""
-
-# -----------------------------------------------------------------------------
-# 8. sécurité optionnelle
-# -----------------------------------------------------------------------------
-echo ">>> Etape 8 : recommandation sécurité"
-
-echo "Optionnel: fermer accès direct"
-echo "sudo ufw delete allow 32168/tcp"
-
-echo ""
-
 
 # -----------------------------------------------------------------------------
 # INSTALLATION TERMINÉE (on peut starter le service)
