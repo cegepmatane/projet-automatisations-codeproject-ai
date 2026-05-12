@@ -1,90 +1,173 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
 # =============================================================================
-# Script d'installation de Codeproject.AI
-# Configure : [A DETERMINER]
-# Usage : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
+# Script d'installation de CodeProject.AI
+#
+# Usage rapide (DEVOPS / DEPLOIEMENT DISTANT)
+#
+# tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
+#
+# NOTE :
+# Cette commande est pratique mais dépend d'un script distant.
+# Pour une meilleure reproductibilité :
+# - git clone du dépôt
+# - vérifier le contenu
+# - exécuter localement
+#
 # =============================================================================
 
-set -e
+# =============================================================================
+# VARIABLES
+# =============================================================================
 
-if [ "$EUID" -ne 0 ]; then
-  echo "Ce script doit etre execute avec sudo."
-  echo "Exemple : sudo bash installation-codeproject-ai.sh"
-  exit 1
+readonly NOM_SERVICE="codeproject.ai-server"
+readonly VERSION_CODEPROJECT="2.9.5"
+
+readonly BUILD_HASH="$(git rev-parse --short HEAD 2>/dev/null || echo 'sans-git')"
+readonly BUILD_DATE="$(date +%Y-%m-%d)"
+
+readonly SERVER_IP="$(hostname -I | awk '{print $1}')"
+
+readonly INSTALL_DIR="/usr/bin/codeproject.ai-server-${VERSION_CODEPROJECT}"
+
+readonly PACKAGE_NAME="codeproject.ai-server_${VERSION_CODEPROJECT}_Ubuntu_x64"
+
+readonly PACKAGE_URL="https://codeproject-ai-bunny.b-cdn.net/server/installers/linux/${PACKAGE_NAME}.zip"
+
+# =============================================================================
+# BANNIERE
+# =============================================================================
+
+banniere() {
+    echo "============================================================"
+    echo "BUILD ${BUILD_HASH} ${BUILD_DATE}"
+    echo "Installation CodeProject.AI"
+    echo "============================================================"
+}
+
+banniere
+
+# =============================================================================
+# VALIDATION ROOT
+# =============================================================================
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "ERREUR : executer avec sudo"
+    exit 1
 fi
 
-SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
-
-echo "============================================================"
-echo "  Installation de Codeproject.AI"
-echo "============================================================"
+# =============================================================================
+# ETAPE 1 - FIREWALL
+# =============================================================================
 
 echo ""
-# -----------------------------------------------------------------------------
-# 1. Activation des ports requis
-# -----------------------------------------------------------------------------
-echo ">>> Etape 1/7 : Configuration du firewall UFW"
+echo ">>> Etape 1/8 : Firewall"
 
 apt-get update
-apt-get install -y ufw
+
+DEBIAN_FRONTEND=noninteractive apt-get install -y ufw
 
 ufw allow 80/tcp
 ufw allow 8080/tcp
 
 ufw --force enable
+
+echo "Verification firewall"
 ufw status verbose
 
+# =============================================================================
+# ETAPE 2 - DEPENDANCES
+# =============================================================================
+
 echo ""
-# -----------------------------------------------------------------------------
-# 2. Installation .NET 9
-# -----------------------------------------------------------------------------
-echo ">>> Etape 2/7 : Installation de .NET 9"
+echo ">>> Etape 2/8 : Dependances"
 
-apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    software-properties-common \
+    unzip \
+    wget \
+    curl \
+    nginx \
+    apache2-utils
+
+echo "Verification curl"
+curl --version | head -n 1
+
+# =============================================================================
+# ETAPE 3 - .NET 9
+# =============================================================================
+
+echo ""
+echo ">>> Etape 3/8 : .NET 9"
+
 yes | add-apt-repository ppa:dotnet/backports
-apt-get update
-apt-get install -y dotnet-sdk-9.0
 
+apt-get update
+
+DEBIAN_FRONTEND=noninteractive apt-get install -y dotnet-sdk-9.0
+
+echo "Verification .NET"
 dotnet --version
 
-echo ""
-# -----------------------------------------------------------------------------
-# 3. Installation unzip
-# -----------------------------------------------------------------------------
-echo ">>> Etape 3/7 : Installation de unzip"
-
-apt-get update
-apt install -y unzip
+# =============================================================================
+# ETAPE 4 - TELECHARGEMENT
+# =============================================================================
 
 echo ""
-# -----------------------------------------------------------------------------
-# 4. Installation de CodeProject.AI-Server
-# -----------------------------------------------------------------------------
-echo ">>> Etape 4/7 : Installation de CodeProject.AI-Server"
+echo ">>> Etape 4/8 : Telechargement"
 
-wget https://codeproject-ai-bunny.b-cdn.net/server/installers/linux/codeproject.ai-server_2.9.5_Ubuntu_x64.zip
-unzip -o codeproject.ai-server_2.9.5_Ubuntu_x64.zip
-rm -f codeproject.ai-server_2.9.5_Ubuntu_x64.zip
-dpkg -i codeproject.ai-server_2.9.5_Ubuntu_x64.deb || apt --fix-broken install -y
-rm -f codeproject.ai-server_2.9.5_Ubuntu_x64.deb
+wget -O "${PACKAGE_NAME}.zip" "${PACKAGE_URL}"
 
-pushd "/usr/bin/codeproject.ai-server-2.9.5/" && bash setup.sh && popd
-pushd "/usr/bin/codeproject.ai-server-2.9.5/server" && bash ../setup.sh && popd
+echo "Verification archive"
+ls -lh "${PACKAGE_NAME}.zip"
 
-systemctl enable codeproject.ai-server
-
-echo "CodeProject.AI-Server installe (OK)"
+# =============================================================================
+# ETAPE 5 - INSTALLATION CODEPROJECT.AI
+# =============================================================================
 
 echo ""
-# -----------------------------------------------------------------------------
-# 5. Nginx + auth
-# -----------------------------------------------------------------------------
-echo ">>> Etape 5/7 : Nginx + auth"
+echo ">>> Etape 5/8 : Installation"
 
-apt-get update
-apt install -y nginx apache2-utils
+unzip -o "${PACKAGE_NAME}.zip"
 
-mkdir -p /etc/nginx/codeproject-ai/
+rm -f "${PACKAGE_NAME}.zip"
+
+dpkg -i "${PACKAGE_NAME}.deb" || apt --fix-broken install -y
+
+rm -f "${PACKAGE_NAME}.deb"
+
+pushd "${INSTALL_DIR}" > /dev/null
+bash setup.sh
+popd > /dev/null
+
+pushd "${INSTALL_DIR}/server" > /dev/null
+bash ../setup.sh
+popd > /dev/null
+
+systemctl enable "${NOM_SERVICE}"
+
+echo "Verification service"
+systemctl is-enabled "${NOM_SERVICE}"
+
+# =============================================================================
+# ETAPE 6 - AUTH NGINX
+# =============================================================================
+
+echo ""
+echo ">>> Etape 6/8 : Auth nginx"
+
+mkdir -p /etc/nginx/codeproject-ai
+
+# NOTE :
+# Partie interactive volontairement conservée temporairement.
+# Peut être automatisée plus tard avec :
+#
+# export ADMIN_PASSWORD="motdepasse"
+#
+# puis :
+#
+# htpasswd -b -c fichier admin "$ADMIN_PASSWORD"
 
 read -s -p "Mot de passe admin: " PASSWORD
 echo
@@ -92,37 +175,37 @@ echo
 htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
 
 chmod 640 /etc/nginx/codeproject-ai/.htpasswd
+
 chown root:www-data /etc/nginx/codeproject-ai/.htpasswd
 
+echo "Verification htpasswd"
+ls -l /etc/nginx/codeproject-ai/.htpasswd
+
+# =============================================================================
+# ETAPE 7 - CONFIGURATION NGINX
+# =============================================================================
+
 echo ""
-# -----------------------------------------------------------------------------
-# 6. Nginx config CLEAN
-# -----------------------------------------------------------------------------
-echo ">>> Etape 6/7 : Nginx config"
+echo ">>> Etape 7/8 : Configuration nginx"
 
 cat > /etc/nginx/sites-available/codeproject-ai << EOF
-
-# definit la rate limite
-# conserve les IPs dans la variable \$binary_remote_addr de 10 megabytes
-# limite a 10 requetes par secondes
 limit_req_zone \$binary_remote_addr zone=limite_adresses:10m rate=10r/s;
 
 server {
     listen 80;
-    server_name $SERVER_IP;
+    server_name ${SERVER_IP};
 
-    # applique la rate limite
     limit_req zone=limite_adresses burst=20 nodelay;
+
     client_max_body_size 20M;
 
-    # 1 - Public site (no auth)
     location /codeproject-ai/ {
         root /var/www/html;
         index index.html;
     }
 
-    # 2 - API publique (pas d'auth, meme origine = pas de CORS)
     location /codeproject-api/ {
+
         proxy_pass http://127.0.0.1:32168/;
 
         proxy_set_header Host \$host;
@@ -130,6 +213,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 
         proxy_http_version 1.1;
+
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
@@ -137,13 +221,10 @@ server {
 }
 
 server {
-    listen 8080;
-    server_name $SERVER_IP;
 
-    # applique la rate limite
-    # met jusqu'a 20 requetes dans la file d'attente
-    # nodelay fait en sorte que les requetes dans la file d'attente n'aient pas de delais,
-    # ce qui evite que l'application apparaisse lante
+    listen 8080;
+
+    server_name ${SERVER_IP};
 
     limit_req zone=limite_adresses burst=20 nodelay;
 
@@ -152,91 +233,152 @@ server {
     auth_basic "Admin Only";
     auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
 
-    # 3 - Dashboard admin protégé
     location / {
+
         proxy_pass http://127.0.0.1:32168/;
+
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 
         proxy_http_version 1.1;
+
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
+
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
     }
 }
-
 EOF
 
-ln -sf /etc/nginx/sites-available/codeproject-ai /etc/nginx/sites-enabled/codeproject-ai
+ln -sf \
+/etc/nginx/sites-available/codeproject-ai \
+/etc/nginx/sites-enabled/codeproject-ai
 
-nginx -t && systemctl restart nginx
+echo "Verification nginx config"
 
-echo "OK nginx configuré"
+nginx -t
+
+systemctl restart nginx
+
+# =============================================================================
+# ETAPE 8 - WEBCLIENT
+# =============================================================================
 
 echo ""
-# -----------------------------------------------------------------------------
-# 7. index.html
-# -----------------------------------------------------------------------------
-echo ">>> Etape 7/7 : index.html"
+echo ">>> Etape 8/8 : Webclient"
 
 mkdir -p /var/www/html/codeproject-ai
 
 cat > /var/www/html/codeproject-ai/index.html << EOF
-
 <html>
-    <body>
-    Detect the scene in this file: <input id="image" type="file" />
-    <input type="button" value="Detect Scene" onclick="detectScene(image)" />
+<body>
 
-    <script>
-    function detectScene(fileChooser) {
-        var formData = new FormData();
-        formData.append('image', fileChooser.files[0]);
+Detect the scene in this file:
+<input id="image" type="file" />
 
-        fetch('http://$SERVER_IP/codeproject-api/v1/vision/detection', {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
+<input type="button"
+       value="Detect Scene"
+       onclick="detectScene(image)" />
 
-            const pred = data.predictions?.[0];
+<script>
 
-            if (pred) {
-                console.log(pred.label, pred.confidence);
-            }
-        });
-    }
-    </script>
-    </body>
+function detectScene(fileChooser) {
+
+    var formData = new FormData();
+
+    formData.append('image', fileChooser.files[0]);
+
+    fetch('http://${SERVER_IP}/codeproject-api/v1/vision/detection', {
+
+        method: "POST",
+        body: formData
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        console.log(data);
+
+        const pred = data.predictions?.[0];
+
+        if (pred) {
+            console.log(pred.label, pred.confidence);
+        }
+    });
+}
+
+</script>
+
+</body>
 </html>
-
 EOF
 
-echo "OK index.html"
+# =============================================================================
+# DEMARRAGE
+# =============================================================================
 
 echo ""
-# -----------------------------------------------------------------------------
-# INSTALLATION TERMINÉE (on peut starter le service)
-# -----------------------------------------------------------------------------
-echo ">>> INSTALLATION TERMINEE!!!"
+echo ">>> Demarrage"
 
-systemctl start codeproject.ai-server
+systemctl start "${NOM_SERVICE}"
 
-sed -i '0,/"AutoStart": true/s//"AutoStart": false/' \
-/usr/bin/codeproject.ai-server-2.9.5/modules/FaceProcessing/modulesettings.json 2>/dev/null
-sed -i '0,/"AutoStart": true/s//"AutoStart": false/' \
-/usr/bin/codeproject.ai-server-2.9.5/modules/ObjectDetectionYOLOv5Net/modulesettings.json 2>/dev/null
+# =============================================================================
+# OPTIMISATION
+# =============================================================================
 
-rm -rf /usr/bin/codeproject.ai-server-2.9.5/modules/FaceProcessing || true
-rm -rf /usr/bin/codeproject.ai-server-2.9.5/modules/ObjectDetectionYOLOv5Net || true
+echo ""
+echo ">>> Optimisation"
 
-echo "> service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
-echo "> ouvrir http://$SERVER_IP:8080 pour consulter le dashboard (OK)"
-echo "> et ouvrir http://$SERVER_IP/codeproject-ai/ pour faire une détecton d'image (OK)"
+sed -i \
+'0,/"AutoStart": true/s//"AutoStart": false/' \
+"${INSTALL_DIR}/modules/FaceProcessing/modulesettings.json" \
+2>/dev/null || true
 
+sed -i \
+'0,/"AutoStart": true/s//"AutoStart": false/' \
+"${INSTALL_DIR}/modules/ObjectDetectionYOLOv5Net/modulesettings.json" \
+2>/dev/null || true
+
+rm -rf "${INSTALL_DIR}/modules/FaceProcessing" || true
+
+rm -rf "${INSTALL_DIR}/modules/ObjectDetectionYOLOv5Net" || true
+
+# =============================================================================
+# VERIFICATIONS FINALES
+# =============================================================================
+
+echo ""
+echo ">>> Verifications finales"
+
+echo "Verification service actif"
+systemctl is-active "${NOM_SERVICE}"
+
+echo "Verification port 32168"
+ss -tlnp | grep ":32168"
+
+echo "Verification port 8080"
+ss -tlnp | grep ":8080"
+
+echo "Verification webclient"
+
+curl -fsS \
+"http://localhost:32168/" \
+> /dev/null && echo "OK"
+
+# =============================================================================
+# FIN
+# =============================================================================
+
+echo ""
+echo "============================================================"
+echo "INSTALLATION TERMINEE"
+echo "============================================================"
+
+echo "Dashboard : http://${SERVER_IP}:8080"
+echo "Webclient : http://${SERVER_IP}/codeproject-ai/"
 echo ""
