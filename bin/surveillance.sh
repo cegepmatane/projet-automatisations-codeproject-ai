@@ -33,7 +33,16 @@ systemctl is-active nginx | tee -a "${FICHIER_AUDIT}"
 
 echo ""
 echo ">>> 6. Test API" | tee -a "${FICHIER_AUDIT}"
-curl -fsS http://localhost:8080/ > /dev/null && echo "API OK" | tee -a "${FICHIER_AUDIT}" || echo "API FAIL" | tee -a "${FICHIER_AUDIT}"
+
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+
+echo "HTTP CODE: $HTTP_CODE" | tee -a "${FICHIER_AUDIT}"
+
+if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 401 ]; then
+    echo "API OK (service up)" | tee -a "${FICHIER_AUDIT}"
+else
+    echo "API FAIL" | tee -a "${FICHIER_AUDIT}"
+fi
 
 echo ""
 echo "AUDIT TERMINÉ"
