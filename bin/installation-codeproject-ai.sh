@@ -198,7 +198,6 @@ server {
     }
 
     location /codeproject-api/ {
-
         proxy_pass http://127.0.0.1:32168/;
 
         proxy_set_header Host \$host;
@@ -214,9 +213,7 @@ server {
 }
 
 server {
-
     listen 8080;
-
     server_name ${SERVER_IP};
 
     limit_req zone=limite_adresses burst=20 nodelay;
@@ -227,7 +224,6 @@ server {
     auth_basic_user_file /etc/nginx/codeproject-ai/.htpasswd;
 
     location / {
-
         proxy_pass http://127.0.0.1:32168/;
 
         proxy_set_header Host \$host;
@@ -267,47 +263,34 @@ mkdir -p /var/www/html/codeproject-ai
 
 cat > /var/www/html/codeproject-ai/index.html << EOF
 <html>
-<body>
-
-Detect the scene in this file:
-<input id="image" type="file" />
-
-<input type="button"
-       value="Detect Scene"
-       onclick="detectScene(image)" />
-
-<script>
-
-function detectScene(fileChooser) {
-
-    var formData = new FormData();
-
-    formData.append('image', fileChooser.files[0]);
-
-    fetch('http://${SERVER_IP}/codeproject-api/v1/vision/detection', {
-
-        method: "POST",
-        body: formData
-
-    })
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        console.log(data);
-
-        const pred = data.predictions?.[0];
-
-        if (pred) {
+  <body>
+    Detecter la scene dans ce fichier:
+    <input id="image" type="file" />
+    
+    <input type="button" value="Detect Scene" onclick="detectScene(image)" />
+    
+    <script>
+      function detectScene(fileChooser) {
+        var formData = new FormData();
+      
+        formData.append('image', fileChooser.files[0]);
+      
+        fetch('http://${SERVER_IP}/codeproject-api/v1/vision/detection', {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+      
+          const pred = data.predictions?.[0];
+          if (pred) {
             console.log(pred.label, pred.confidence);
-        }
-    });
-}
-
-</script>
-
-</body>
+          }
+        });
+      }
+    </script>
+  </body>
 </html>
 EOF
 
