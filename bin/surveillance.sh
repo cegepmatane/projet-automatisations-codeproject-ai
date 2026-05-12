@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# =============================================================================
+# Script de surveillance de CodeProject.AI
+# - Usage : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/surveillance.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
+#
+# =============================================================================
 
 readonly NOM_SERVICE="codeproject.ai-server"
 
