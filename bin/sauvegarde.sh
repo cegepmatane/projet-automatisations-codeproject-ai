@@ -1,26 +1,35 @@
-#!/bin/bash
-# =============================================================================
-# Script d'installation de Codeproject.AI
-# Configure : [A DETERMINER]
-# Usage : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
-# =============================================================================
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+readonly NOM_SERVICE="codeproject.ai-server"
 
-if [ "$EUID" -ne 0 ]; then
-  echo "Ce script doit etre execute avec sudo."
-  echo "Exemple : sudo bash installation-codeproject-ai.sh"
-  exit 1
-fi
+readonly DOSSIER_BACKUP="/root/backups/${NOM_SERVICE}"
+readonly DATE_HORO="$(date +%Y-%m-%d_%H-%M)"
+readonly ARCHIVE="${NOM_SERVICE}-${DATE_HORO}.tar.gz"
 
-SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
+# dossiers probables (ajuste si besoin)
+readonly DATA_DIR="/var/lib/${NOM_SERVICE}"
+readonly NGINX_DIR="/etc/nginx/codeproject-ai"
 
-echo "============================================================"
-echo "  Installation de Codeproject.AI"
-echo "============================================================"
+echo "===== BACKUP ${NOM_SERVICE} ${DATE_HORO} ====="
 
-echo ""
-# -----------------------------------------------------------------------------
-# 1. Activation des ports requis
-# -----------------------------------------------------------------------------
-echo ">>> Etape 1/7 : Configuration du firewall UFW"
+mkdir -p "${DOSSIER_BACKUP}"
+
+echo ">>> Création archive..."
+
+tar -czf "${DOSSIER_BACKUP}/${ARCHIVE}" \
+    "${DATA_DIR}" \
+    "${NGINX_DIR}" \
+    /var/www/html/codeproject-ai \
+    /etc/nginx/sites-available/codeproject-ai \
+    /etc/nginx/sites-enabled/codeproject-ai \
+    2>/dev/null || true
+
+echo ">>> Rotation (garde 7 jours)"
+
+find "${DOSSIER_BACKUP}" \
+    -name "${NOM_SERVICE}-*.tar.gz" \
+    -mtime +7 \
+    -delete
+
+echo "BACKUP OK : ${ARCHIVE}"
