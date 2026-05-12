@@ -3,8 +3,8 @@ set -euo pipefail
 
 # =============================================================================
 # Script d'installation de CodeProject.AI
-#
-# Usage rapide (DEVOPS / DEPLOIEMENT DISTANT) : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
+# - Configure : installation complète du service (paquet, config nginx, service systemd, port, webclient)
+# - Usage dev : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
 #
 # =============================================================================
 
