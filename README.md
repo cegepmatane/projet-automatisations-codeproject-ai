@@ -7,6 +7,10 @@ projet-automatisations...
 ```bash
 tmp=$(mktemp) && curl -fsSL "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
 ```
+ou directement entrer le mot passe de nginx pour la page avec l'utilisateur "admin" sur le navigateur:
+```bash
+export ADMIN_PASSWORD="VotreMotDePasseSemiSecurise" && tmp=$(mktemp) && curl -fsSL "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp" && rm -f "$tmp"
+```
 
 ## BONUS : Script de desinstallation de Codeproject.AI
 - Configure : suppression complète du service et nettoyage du système

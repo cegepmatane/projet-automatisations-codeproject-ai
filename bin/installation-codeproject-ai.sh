@@ -153,19 +153,16 @@ echo ">>> Etape 6/8 : Auth nginx"
 mkdir -p /etc/nginx/codeproject-ai
 
 # NOTE :
-# Partie interactive volontairement conservée temporairement.
-# Peut être automatisée plus tard avec :
-#
+# Exemple automatisable :
 # export ADMIN_PASSWORD="motdepasse"
-#
-# puis :
-#
-# htpasswd -b -c fichier admin "$ADMIN_PASSWORD"
+# htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$ADMIN_PASSWORD"
 
-read -s -p "Mot de passe admin: " PASSWORD
-echo
+if [ -z "${ADMIN_PASSWORD:-}" ]; then
+    read -s -p "Mot de passe admin: " ADMIN_PASSWORD
+    echo
+fi
 
-htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$PASSWORD"
+htpasswd -b -c /etc/nginx/codeproject-ai/.htpasswd admin "$ADMIN_PASSWORD"
 
 chmod 640 /etc/nginx/codeproject-ai/.htpasswd
 
