@@ -4,16 +4,7 @@ set -euo pipefail
 # =============================================================================
 # Script d'installation de CodeProject.AI
 #
-# Usage rapide (DEVOPS / DEPLOIEMENT DISTANT)
-#
-# tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
-#
-# NOTE :
-# Cette commande est pratique mais dépend d'un script distant.
-# Pour une meilleure reproductibilité :
-# - git clone du dépôt
-# - vérifier le contenu
-# - exécuter localement
+# Usage rapide (DEVOPS / DEPLOIEMENT DISTANT) : tmp=$(mktemp) && curl -fsSL -H "Cache-Control: no-cache" "https://raw.githubusercontent.com/cegepmatane/projet-automatisations-codeproject-ai/main/bin/installation-codeproject-ai.sh" -o "$tmp" && chmod +x "$tmp" && sudo "$tmp"; rm -f "$tmp"
 #
 # =============================================================================
 
@@ -360,23 +351,12 @@ echo ">>> Verifications finales"
 echo "Verification service actif"
 systemctl is-active "${NOM_SERVICE}"
 
-echo "Verification port 32168"
-if ss -tlnp | grep -q ":32168"; then
-    echo "OK port 32168"
-else
-    echo "WARNING: port 32168 non detecte"
-fi
-
 echo "Verification port 8080"
-if ss -tlnp | grep -q ":8080"; then
-    echo "OK port 8080"
-else
-    echo "WARNING: port 8080 non detecte"
-fi
+ss -tlnp | grep ":8080"
 
 echo "Verification webclient"
 curl -fsS \
-"http://localhost:32168/" \
+"http://localhost:8080/" \
 > /dev/null && echo "OK"
 
 # =============================================================================
