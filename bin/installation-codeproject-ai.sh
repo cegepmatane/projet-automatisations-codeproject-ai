@@ -101,7 +101,9 @@ curl --version | head -n 1
 echo ""
 echo ">>> Etape 3/8 : .NET 9"
 
-yes | add-apt-repository ppa:dotnet/backports
+if ! add-apt-repository -y ppa:dotnet/backports; then
+  echo "WARNING: PPA déjà présent ou erreur mineure (continuing)"
+fi
 
 apt-get update
 
@@ -359,13 +361,20 @@ echo "Verification service actif"
 systemctl is-active "${NOM_SERVICE}"
 
 echo "Verification port 32168"
-ss -tlnp | grep ":32168"
+if ss -tlnp | grep -q ":32168"; then
+    echo "OK port 32168"
+else
+    echo "WARNING: port 32168 non detecte"
+fi
 
 echo "Verification port 8080"
-ss -tlnp | grep ":8080"
+if ss -tlnp | grep -q ":8080"; then
+    echo "OK port 8080"
+else
+    echo "WARNING: port 8080 non detecte"
+fi
 
 echo "Verification webclient"
-
 curl -fsS \
 "http://localhost:32168/" \
 > /dev/null && echo "OK"
