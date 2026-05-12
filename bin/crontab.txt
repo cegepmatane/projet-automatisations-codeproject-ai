@@ -1,0 +1,1 @@
+*/10 * * * * /root/scripts/audit-codeproject-ai.sh >> /root/audit/cron.log 2>&1
