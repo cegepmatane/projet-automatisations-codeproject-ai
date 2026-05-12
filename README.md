@@ -1,6 +1,9 @@
 # Cédric Simard
 projet-automatisations...
 
+## [Feuille Synthèse](https://1drv.ms/w/c/b850b47cdbccabb1/IQD7YbWTu1s9TakNjQXnIlGhAWu0qbTND_UmNBKJ9o9Sk4g?e=dZ7nBQ)...
+
+
 ## Script d'installation de CodeProject.AI :
 - Configure : installation complète du service (paquet, config nginx, service systemd, port, webclient)
 - Usage : 
