@@ -13,18 +13,17 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
+
 echo "============================================================"
 echo "  Installation de Codeproject.AI"
 echo "============================================================"
 
 echo ""
-
-SERVER_IP=$(hostname -I | awk '{print $1}') # ip du server
-
 # -----------------------------------------------------------------------------
 # 1. Activation des ports requis
 # -----------------------------------------------------------------------------
-echo ">>> Etape 1/X : Configuration du firewall UFW"
+echo ">>> Etape 1/7 : Configuration du firewall UFW"
 
 apt-get update
 apt-get install -y ufw
@@ -36,11 +35,10 @@ ufw --force enable
 ufw status verbose
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # 2. Installation .NET 9
 # -----------------------------------------------------------------------------
-echo ">>> Etape 2/X : Installation de .NET 9"
+echo ">>> Etape 2/7 : Installation de .NET 9"
 
 apt-get update
 yes | add-apt-repository ppa:dotnet/backports
@@ -50,21 +48,19 @@ apt-get install -y dotnet-sdk-9.0
 dotnet --version
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # 3. Installation unzip
 # -----------------------------------------------------------------------------
-echo ">>> Etape 3/X : Installation de unzip"
+echo ">>> Etape 3/7 : Installation de unzip"
 
 apt-get update
 apt install -y unzip
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # 4. Installation de CodeProject.AI-Server
 # -----------------------------------------------------------------------------
-echo ">>> Etape 4/X : Installation de CodeProject.AI-Server"
+echo ">>> Etape 4/7 : Installation de CodeProject.AI-Server"
 
 wget https://codeproject-ai-bunny.b-cdn.net/server/installers/linux/codeproject.ai-server_2.9.5_Ubuntu_x64.zip
 unzip -o codeproject.ai-server_2.9.5_Ubuntu_x64.zip
@@ -80,11 +76,10 @@ systemctl enable codeproject.ai-server
 echo "CodeProject.AI-Server installe (OK)"
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # 5. Nginx + auth
 # -----------------------------------------------------------------------------
-echo ">>> Etape 5 : Nginx + auth"
+echo ">>> Etape 5/7 : Nginx + auth"
 
 apt-get update
 apt install -y nginx apache2-utils
@@ -100,11 +95,10 @@ chmod 640 /etc/nginx/codeproject-ai/.htpasswd
 chown root:www-data /etc/nginx/codeproject-ai/.htpasswd
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # 6. Nginx config CLEAN
 # -----------------------------------------------------------------------------
-echo ">>> Etape 6 : Nginx config"
+echo ">>> Etape 6/7 : Nginx config"
 
 cat > /etc/nginx/sites-available/codeproject-ai << EOF
 
@@ -114,7 +108,6 @@ cat > /etc/nginx/sites-available/codeproject-ai << EOF
 limit_req_zone \$binary_remote_addr zone=limite_adresses:10m rate=10r/s;
 
 server {
-
     listen 80;
     server_name $SERVER_IP;
 
@@ -184,11 +177,10 @@ nginx -t && systemctl restart nginx
 echo "OK nginx configuré"
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # 7. index.html
 # -----------------------------------------------------------------------------
-echo ">>> Etape 7 : index.html"
+echo ">>> Etape 7/7 : index.html"
 
 mkdir -p /var/www/html/codeproject-ai
 
@@ -228,11 +220,10 @@ EOF
 echo "OK index.html"
 
 echo ""
-
 # -----------------------------------------------------------------------------
 # INSTALLATION TERMINÉE (on peut starter le service)
 # -----------------------------------------------------------------------------
-echo ">>> INSTALLATION TERMINEE!"
+echo ">>> INSTALLATION TERMINEE!!!"
 
 sed -i '0,/"AutoStart": true/s//"AutoStart": false/' \
 /usr/bin/codeproject.ai-server-2.9.5/modules/FaceProcessing/modulesettings.json
@@ -244,8 +235,8 @@ rm -rf /usr/bin/codeproject.ai-server-2.9.5/modules/ObjectDetectionYOLOv5Net
 
 systemctl start codeproject.ai-server
 
-echo "service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
-echo "ouvrir http://$SERVER_IP:8080 pour consulter le dashboard (OK)"
-echo "et ouvrir http://$SERVER_IP/codeproject-ai/ pour faire une détecton d'image (OK)"
+echo "> service CodeProject.AI-Server installe sur http://localhost:32168 (OK)"
+echo "> ouvrir http://$SERVER_IP:8080 pour consulter le dashboard (OK)"
+echo "> et ouvrir http://$SERVER_IP/codeproject-ai/ pour faire une détecton d'image (OK)"
 
 echo ""
