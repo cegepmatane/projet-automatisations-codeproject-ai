@@ -3,6 +3,9 @@ projet-automatisations...
 
 ## [Feuille Synthèse](https://1drv.ms/w/c/b850b47cdbccabb1/IQD7YbWTu1s9TakNjQXnIlGhAWu0qbTND_UmNBKJ9o9Sk4g?e=dZ7nBQ)...
 
+## NOTE : 
+Par exemple, les pages vont être http://192.46.222.166:8080 et http://192.46.222.166/codeproject-ai/. Aussi, le contenu de http://192.46.222.166/index.html devrait être accessible même après l'installation.
+
 
 ## Script d'installation de CodeProject.AI :
 - Configure : installation complète du service (paquet, config nginx, service systemd, port, webclient)
