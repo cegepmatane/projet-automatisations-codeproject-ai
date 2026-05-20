@@ -1,3 +1,13 @@
+# SI SUR UN SERVER C'EST http://192.46.222.166:8090
+
+localhost:8090 sinon
+
+
+
+
+
+
+
 # Labo - Demande 1 - Borne d'accueil du zoo
 
 ## Ce que le prestataire a livre
