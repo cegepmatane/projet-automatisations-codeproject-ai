@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-# ─── Variables ────────────────────────────────────────────────────────────────
+#Variables
 nomImage="zoo-pavillon-oiseaux"
 tagVersion="1.0"
 
-# ─── Couleurs ANSI ────────────────────────────────────────────────────────────
+#Couleurs ANSI
 BLEU="\033[1;34m"
 VERT="\033[1;32m"
 RESET="\033[0m"
 
-# ─── Construction ─────────────────────────────────────────────────────────────
+#Construction
 echo -e "${BLEU}[info]${RESET} Construction de l'image ${nomImage}:${tagVersion}..."
 
 docker build \
