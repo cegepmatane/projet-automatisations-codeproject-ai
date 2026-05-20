@@ -4,7 +4,7 @@ set -e
 #Variables
 nomImage="zoo-evenements:1.0"
 nomContainer="zoo-evenements"
-portHote="8080"
+portHote="8000"
 portContainer="80"
 
 #Couleurs ANSI
