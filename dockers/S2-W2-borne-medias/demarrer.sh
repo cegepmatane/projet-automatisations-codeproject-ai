@@ -5,11 +5,13 @@ CONTAINER="borne-medias-pygame"
 
 echo "[run] Lancement du container"
 
-# Vérifie si xhost existe
+# cleanup automatique (évite conflits)
+docker rm -f "$CONTAINER" 2>/dev/null || true
+
 if command -v xhost >/dev/null 2>&1; then
   xhost +local:docker
 else
-  echo "[warn] xhost introuvable (installe x11-xserver-utils)"
+  echo "[warn] xhost introuvable"
 fi
 
 docker run -d \
