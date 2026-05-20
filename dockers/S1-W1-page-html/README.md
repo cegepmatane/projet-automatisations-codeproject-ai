@@ -1,3 +1,33 @@
+# TRUCS À FAIRE
+## 1. Construire l'image
+./construire.sh
+## 2. Démarrer le container
+./demarrer.sh
+## 3. Ouvrir dans le navigateur
+### http://localhost:8080/
+## 4. Arrêter quand terminé
+./arreter.sh
+
+# COMMANDES UTILES
+## Voir le container en cours
+docker ps
+## Consulter les logs Apache
+docker logs zoo-oiseaux-en-marche
+## Vérifier le mappage de port
+docker port zoo-oiseaux-en-marche
+
+
+---
+---
+---
+---
+---
+---
+---
+
+
+
+
 # Labo - Demande 1 - Pages HTML
 
 ## Ce que le prestataire a livré

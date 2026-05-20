@@ -1,0 +1,15 @@
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Captures d'ecran de demonstration (optionnel)
+captures/
+
+# Logs locaux d'ollama (rarement deposes ici, mais au cas ou)
+ollama.log
