@@ -33,6 +33,12 @@ else
     echo -e "${VERT}[ok]${RESET} Schéma déjà initialisé, on saute."
 fi
 
+mysql <<EOF
+CREATE USER IF NOT EXISTS 'catalogue_app'@'localhost' IDENTIFIED BY 'pavillon-bsl';
+GRANT ALL PRIVILEGES ON catalogue_especes.* TO 'catalogue_app'@'localhost';
+FLUSH PRIVILEGES;
+EOF
+
 #4. Lancer Apache en avant-plan (devient le PID 1 du container)
 echo -e "${BLEU}[info]${RESET} Lancement d'Apache en avant-plan..."
 exec apache2-foreground

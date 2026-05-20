@@ -1,3 +1,19 @@
+# TESTER AVEC 
+
+sudo docker run -p 8080:80 zoo-catalogue-especes:latest
+
+
+---
+---
+---
+---
+---
+---
+---
+
+
+
+
 # Labo - Demande 3 - Web et données
 
 ## Ce que le prestataire a livré
