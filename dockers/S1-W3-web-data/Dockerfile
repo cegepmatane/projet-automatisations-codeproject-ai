@@ -24,12 +24,12 @@ RUN mkdir -p /docker-entree
 COPY schema.sql /docker-entree/schema.sql
 
 #Copier le script d'orchestration et le rendre exécutable
-COPY demarrer-services.sh /usr/local/bin/demarrer-services.sh
-RUN chmod +x /usr/local/bin/demarrer-services.sh
+COPY demarrer.sh /usr/local/bin/demarrer.sh
+RUN chmod +x /usr/local/bin/demarrer.sh
 
 #Préparer le dossier de données MariaDB avec les bons droits
 RUN mkdir -p /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql
 
 EXPOSE 80
 
-ENTRYPOINT ["/usr/local/bin/demarrer-services.sh"]
+ENTRYPOINT ["/usr/local/bin/demarrer.sh"]
